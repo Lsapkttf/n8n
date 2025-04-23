@@ -1,10 +1,21 @@
 services:
   - type: web
+    name: n8n-free
     plan: free
-    runtime: image
-    name: n8n-service
-    image:
-      url: docker.io/n8nio/n8n:1.89.2
-databases:
-  - name: n8n-db
-    plan: free
+    branch: master
+    buildCommand: |
+      export NODE_OPTIONS="--max-old-space-size=1024"
+      pnpm install --frozen-lockfile
+      pnpm run build
+    startCommand: |
+      export NODE_OPTIONS="--max-old-space-size=1024"
+      node packages/cli/bin/n8n
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: "true"
+      - key: N8N_BASIC_AUTH_USER
+        value: admin
+      - key: N8N_BASIC_AUTH_PASSWORD
+        generateValue: true
