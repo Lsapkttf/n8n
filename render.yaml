@@ -1,0 +1,10 @@
+services:
+  - type: web
+    plan: free
+    runtime: image
+    name: n8n-service
+    image:
+      url: docker.io/n8nio/n8n:1.89.2
+databases:
+  - name: n8n-db
+    plan: free
