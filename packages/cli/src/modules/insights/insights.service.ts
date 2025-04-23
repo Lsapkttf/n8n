@@ -3,7 +3,7 @@ import type { InsightsDateRange } from '@n8n/api-types/src/schemas/insights.sche
 import { Service } from '@n8n/di';
 import { Logger } from 'n8n-core';
 import type { ExecutionLifecycleHooks } from 'n8n-core';
-import type { IRun } from 'n8n-workflow';
+import { UserError, type IRun } from 'n8n-workflow';
 
 import { OnShutdown } from '@/decorators/on-shutdown';
 import { License } from '@/license';
@@ -196,5 +196,26 @@ export class InsightsService {
 			{ key: 'quarter', licensed: maxHistoryInDays >= 90, granularity: 'week' },
 			{ key: 'year', licensed: maxHistoryInDays >= 365, granularity: 'week' },
 		];
+	}
+
+	transformDateRangeToMaxAgeInDays(dateRange: InsightsDateRange['key']): number {
+		const maxHistoryInDays = this.license.getInsightsMaxHistory();
+		const dateRangeToDays: Record<InsightsDateRange['key'], number> = {
+			day: 1,
+			week: 7,
+			'2weeks': 14,
+			month: 30,
+			quarter: 90,
+			year: 365,
+		};
+		const maxAgeInDays = dateRangeToDays[dateRange];
+
+		if (maxHistoryInDays < maxAgeInDays) {
+			throw new UserError(
+				'The selected date range exceeds the maximum history allowed by your license.',
+			);
+		}
+
+		return maxAgeInDays;
 	}
 }

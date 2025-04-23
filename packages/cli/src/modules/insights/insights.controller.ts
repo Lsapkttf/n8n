@@ -1,4 +1,4 @@
-import { ListInsightsWorkflowQueryDto } from '@n8n/api-types';
+import { ListInsightsWorkflowQueryDto, InsightsDateFilterDto } from '@n8n/api-types';
 import type { InsightsSummary, InsightsByTime, InsightsByWorkflow } from '@n8n/api-types';
 
 import { Get, GlobalScope, Licensed, Query, RestController } from '@/decorators';
@@ -12,11 +12,16 @@ export class InsightsController {
 
 	constructor(private readonly insightsService: InsightsService) {}
 
+	getMaxAgeInDays(payload: InsightsDateFilterDto): number {
+		return this.insightsService.transformDateRangeToMaxAgeInDays(payload.dateRange ?? 'week');
+	}
+
 	@Get('/summary')
 	@GlobalScope('insights:list')
-	async getInsightsSummary(): Promise<InsightsSummary> {
+	async getInsightsSummary(@Query payload: InsightsDateFilterDto): Promise<InsightsSummary> {
+		const maxAgeInDays = this.getMaxAgeInDays(payload);
 		return await this.insightsService.getInsightsSummary({
-			periodLengthInDays: this.maxAgeInDaysFilteredInsights,
+			periodLengthInDays: maxAgeInDays,
 		});
 	}
 
