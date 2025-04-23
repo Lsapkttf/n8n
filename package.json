@@ -8,6 +8,8 @@
   },
   "packageManager": "pnpm@10.2.1",
   "scripts": {
+    "build:light": "turbo run build --filter=!n8n-nodes-base",
+    "start:light": "node packages/cli/bin/n8n"
     "prepare": "node scripts/prepare.mjs",
     "preinstall": "node scripts/block-npm-install.js",
     "build": "turbo run build",
