@@ -2,11 +2,10 @@ services:
   - type: web
     name: n8n-free
     plan: free
-    branch: master
     buildCommand: |
       export NODE_OPTIONS="--max-old-space-size=1024"
-      pnpm install --frozen-lockfile
-      pnpm run build
+      pnpm install --frozen-lockfile --ignore-scripts
+      pnpm run build --filter=@n8n/core --filter=@n8n/workflow
     startCommand: |
       export NODE_OPTIONS="--max-old-space-size=1024"
       node packages/cli/bin/n8n
